@@ -1,0 +1,12 @@
+ul {
+    display: flex;
+    list-style-type: none;
+}
+
+li {
+	padding: 12px;
+	margin: 8px;
+	background-color: #ddd;
+	border-radius: 8px;
+	cursor: pointer;
+}
