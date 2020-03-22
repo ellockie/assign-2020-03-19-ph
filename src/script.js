@@ -75,18 +75,6 @@ async function setUrlNotFoundMessage(showMessage) {
   // TODO
 }
 
-
-/**
- * Shows / hides results page
- *
- * @param {boolean} showPage - If shows is true, shows results page
- * @param {string} url - Submitted URL
- */
-function showResultPage(showPage, url) {
-  console.log('showResultPage');
-  // TODO
-}
-
 /**
  * Stores the URL and shows results pag
  *
@@ -175,7 +163,7 @@ function displayBookmarks(page) {
 }
 
 /**
- * Renders Bookmarks
+ * Renders current page bookmarks.
  *
  * @param {Object[]} bookmarks - The bookmarks to render.
  * @param {string} bookmarks[].name - The name of a bookmark.
@@ -187,7 +175,7 @@ function renderBookmarks(bookmarks) {
 }
 
 /**
- * Renders the paginator
+ * Renders the paginator.
  *
  * @param {Object[]} bookmarks - All stored bookmarks.
  * @param {string} bookmark.name - Bookmark's name.
@@ -197,6 +185,20 @@ function renderBookmarks(bookmarks) {
 function renderPaginator(bookmarks, page) {
   console.log('function renderPaginator(bookmarks, page)');
   // TODO
+}
+
+/**
+ * Shows / hides results page
+ *
+ * @param {boolean} shouldDisplay - If shows is true, shows results page
+ * @param {string} url - Submitted URL
+ */
+function showResultPage(shouldDisplay, url) {
+  console.log('showResultPage, shouldDisplay:', shouldDisplay);
+  // TODO
+  const resultPageContainer = document.getElementById('results-page-container');
+  console.log('resultPageContainer:', resultPageContainer);
+  resultPageContainer.style['visibility'] = shouldDisplay ? 'visible' : 'hidden';
 }
 
 /* =======================  Event listeners  ======================= */
@@ -279,7 +281,7 @@ async function onNameChange(event) {
 }
 
 /**
- * Add bookmark
+ * Submit bookmark
  *
  * @param {Event} event - Change event.
  */
@@ -298,6 +300,16 @@ async function onBookmarkSubmit(event) {
   }
 }
 
+/**
+ * React to bookmark's name change
+ *
+ * @param {Event} event - Change event.
+ */
+async function onResultPageClose(event) {
+  console.log('function onResultPageClose');
+  showResultPage(false, null);
+}
+
 /* =======================  Main  ======================= */
 
 /**
@@ -309,6 +321,7 @@ async function main() {
   addEventListeners('bookmark-url', 'input', onUrlChange);
   addEventListeners('bookmark-name', 'input', onNameChange);
   addEventListeners('new-bookmark-form', 'submit', onBookmarkSubmit);
+  addEventListeners('go-back', 'click', onResultPageClose);
   displayBookmarks('0');
 }
 
