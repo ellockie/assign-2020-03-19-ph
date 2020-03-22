@@ -1,1 +1,3 @@
-console.log("Idzia bidiza min!");
+/* global console */
+
+console.log('Hello!');
