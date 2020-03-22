@@ -4,7 +4,7 @@
 - Syntax validation
 - URL online check
 ## Tech used
-- JSDocs
 - ES8
-- ESLint
+- ESLint linting
 - Google JavaScript style guide (ES2015+ version) config
+- JSDoc annotations
