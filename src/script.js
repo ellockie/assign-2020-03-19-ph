@@ -171,7 +171,7 @@ function displayBookmarks(page) {
   const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
-  setPaginatorEventListeners();
+  addEventListeners('paginator-button', 'click', myTEMPFunction);
 }
 
 /**
@@ -202,21 +202,49 @@ function renderPaginator(bookmarks, page) {
 /* =======================  Event listeners  ======================= */
 
 /**
- * Sets event listeners
+ * TODO
  *
  */
-function setPaginatorEventListeners() {
-  const elements = document.getElementsByClassName('paginator-button');
+function myTEMPFunction() {
+  console.log('function myTEMPFunction');
+  const attribute = this.getAttribute('data-myattribute');
+  console.log(attribute);
+  removeEventListeners('paginator-button', 'click', myTEMPFunction);
+  // displayBookmarks(attribute);
+}
 
-  const myFunction = function() {
-    const attribute = this.getAttribute('data-myattribute');
-    console.log(attribute);
-    displayBookmarks(attribute);
-  };
 
+/**
+ * Sets event listeners of a given type to elements of a given CSS class.
+ *
+ * @param {string} className - Target CSS class name.
+ * @param {string} eventType - Event type to add.
+ * @param {function} eventHandlerFunction - Event handler function to add.
+ */
+function addEventListeners(className, eventType, eventHandlerFunction) {
+  console.log('function addEventListeners');
+  const elements = document.getElementsByClassName(className);
   Array.from(elements).forEach((element) => {
-    element.addEventListener('click', myFunction, false);
+    element.addEventListener(eventType, eventHandlerFunction, false);
   });
+  // TODO: remove those listeners when not needed
+}
+
+
+/**
+ * Removes event listeners of a given type from elements of a given CSS class.
+ *
+ * @param {string} className - Target CSS class name.
+ * @param {string} eventType - Event type to remove.
+ * @param {function} eventHandlerFunction - Event handler function to remove.
+ */
+function removeEventListeners(className, eventType, eventHandlerFunction) {
+  console.log('function removeEventListeners');
+  const elements = document.getElementsByClassName(className);
+  Array.from(elements).forEach((element) => {
+    element.removeEventListener(eventType, eventHandlerFunction);
+  });
+  // TODO: remove those listeners when not needed
 }
 
 /**
