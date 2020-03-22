@@ -1,4 +1,4 @@
-/* global console */
+/* global console, document */
 
 console.log('Hello!');
 
@@ -127,11 +127,24 @@ function loadBookmarks() {
  * Stores the Bookmark to local storage
  *
  * @param {Object} bookmark - The bookmark to store.
- * @param {string} bookmark.name - The name of the bookmark.
- * @param {string} bookmark.url - The bookmar's url.
+ * @param {string} bookmark.name - Bookmark's name.
+ * @param {string} bookmark.url - Bbookmark's url.
  */
 function storeBookmark(bookmark) {
   console.log('function storeUrl(bookmark)');
+  // TODO
+}
+
+/**
+ * Stores the Bookmark to local storage
+ *
+ * @param {Object[]} bookmarks - The bookmarks to render.
+ * @param {string} bookmark.name - Bookmark's name.
+ * @param {string} bookmark.url - Bbookmark's url.
+ * @param {number} page - Current page.
+ */
+function getCurrentPageBookmarks(bookmarks, page) {
+  console.log('function getCurrentPageBookmarks(bookmarks, page)');
   // TODO
 }
 
@@ -140,26 +153,70 @@ function storeBookmark(bookmark) {
 /**
  * Renders bookmarks list and paginator
  *
- * @param {*} page
+ * @param {string} page - Page / relative page to display.
  */
 function displayBookmarks(page) {
   console.log('function displayBookmarks(page)');
+  const pageNumber = parseInt(page, 10);
+  if (pageNumber) {
+    displayBookmarks(pageNumber);
+  } else if (page === 'prev') {
+    // TODO:
+    displayBookmarks('prev');
+  } else if (page === 'next') {
+    // TODO:
+    displayBookmarks('next');
+  }
   const bookmarks = loadBookmarks(page);
   const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
+  setPaginatorEventListeners();
 }
 
 /**
- * Stores the Bookmark to local storage
+ * Renders Bookmarks
  *
- * @param {Object[]} bookmarks - The bookmarks to display.
- * @param {string} bookmarks[].name - The name of the bookmark.
- * @param {string} bookmarks[].url - The bookmar's url.
+ * @param {Object[]} bookmarks - The bookmarks to render.
+ * @param {string} bookmarks[].name - The name of a bookmark.
+ * @param {string} bookmarks[].url - Bookmark's url.
  */
 function renderBookmarks(bookmarks) {
   console.log('function renderBookmarks(bookmarks)');
   // TODO
+}
+
+/**
+ * Renders the paginator
+ *
+ * @param {Object[]} bookmarks - All stored bookmarks.
+ * @param {string} bookmark.name - Bookmark's name.
+ * @param {string} bookmark.url - Bbookmark's url.
+ * @param {number} page - Current page.
+ */
+function renderPaginator(bookmarks, page) {
+  console.log('function renderPaginator(bookmarks, page)');
+  // TODO
+}
+
+/* =======================  Event listeners  ======================= */
+
+/**
+ * Sets event listeners
+ *
+ */
+function setPaginatorEventListeners() {
+  const elements = document.getElementsByClassName('paginator-button');
+
+  const myFunction = function() {
+    const attribute = this.getAttribute('data-myattribute');
+    console.log(attribute);
+    displayBookmarks(attribute);
+  };
+
+  Array.from(elements).forEach((element) => {
+    element.addEventListener('click', myFunction, false);
+  });
 }
 
 /**
@@ -185,7 +242,7 @@ async function onUrlChange(event) {
  * @return {void}
  */
 async function main() {
-  displayBookmarks(0);
+  displayBookmarks('0');
 }
 
 main();
