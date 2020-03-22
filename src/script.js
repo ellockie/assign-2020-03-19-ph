@@ -6,8 +6,8 @@ console.log('Hello!');
 /**
  * Validates given URL (async)
  *
- * @param {string} url URL to validate
- * @return {boolean} Validation result
+ * @param {string} url - URL to validate
+ * @return {boolean} - Validation result
  */
 async function validateUrl(url) {
   console.log('validateUrl');
@@ -30,8 +30,8 @@ async function validateUrl(url) {
 /**
  * Validates URL's syntax
  *
- * @param {string} url URL to validate
- * @return {boolean} Validation result
+ * @param {string} url - URL to validate
+ * @return {boolean} - Validation result
  */
 function validateUrlSyntax() {
   const urlvalid = false;
@@ -43,8 +43,8 @@ function validateUrlSyntax() {
 /**
  * Checks if URL is online
  *
- * @param {string} url URL to validate
- * @return {boolean} Verification result
+ * @param {string} url - URL to validate
+ * @return {boolean} - Verification result
  */
 async function validateUrlExists() {
   const urlExists = false;
@@ -56,7 +56,7 @@ async function validateUrlExists() {
 /**
  * Sets URL syntax invalid message
  *
- * @param {boolean} showMessage Show or hide flag
+ * @param {boolean} showMessage - Show or hide flag
  * @return {void}
  */
 async function setUrlSyntaxInvalidMessage(showMessage) {
@@ -67,7 +67,7 @@ async function setUrlSyntaxInvalidMessage(showMessage) {
 /**
  * Sets URL "not found" message
  *
- * @param {boolean} showMessage Show or hide flag
+ * @param {boolean} showMessage - Show or hide flag
  * @return {void}
  */
 async function setUrlNotFoundMessage(showMessage) {
@@ -79,8 +79,8 @@ async function setUrlNotFoundMessage(showMessage) {
 /**
  * Shows / hides results page
  *
- * @param {boolean} showPage If shows is true, shows results page
- * @param {string} url Submitted URL
+ * @param {boolean} showPage - If shows is true, shows results page
+ * @param {string} url - Submitted URL
  */
 function showResultPage(showPage, url) {
   console.log('showResultPage');
@@ -90,7 +90,7 @@ function showResultPage(showPage, url) {
 /**
  * Stores the URL and shows results pag
  *
- * @return {string} URL from input
+ * @return {string} - URL from input
  */
 function getUrlFromForm() {
   // TODO
@@ -100,32 +100,75 @@ function getUrlFromForm() {
 }
 
 /**
- * Stores the URL and shows results pag
+ * Stores the Bookmark and shows results page
  *
  * @param {string} url
  */
 function addUrl(url) {
   console.log('addUrl');
-  storeUrl(url);
+  storeBookmark(url);
   showResultPage(true, url);
 }
 
+/* ======================  Local storage operations  ======================= */
+
 /**
- * Stores the URL to local storage
+ * Loads Bookmarks from local storage
  *
- * @param {string} url
+ * @return {Object[]} - List of loaded bookmarks.
  */
-function storeUrl(url) {
-  console.log('function storeUrl(url)');
+function loadBookmarks() {
+  console.log('function storeUrl(bookmark)');
+  // TODO
+  return [];
+}
+
+/**
+ * Stores the Bookmark to local storage
+ *
+ * @param {Object} bookmark - The bookmark to store.
+ * @param {string} bookmark.name - The name of the bookmark.
+ * @param {string} bookmark.url - The bookmar's url.
+ */
+function storeBookmark(bookmark) {
+  console.log('function storeUrl(bookmark)');
+  // TODO
+}
+
+/* =======================  Bookmarks list rendering  ======================= */
+
+/**
+ * Renders bookmarks list and paginator
+ *
+ * @param {*} page
+ */
+function displayBookmarks(page) {
+  console.log('function displayBookmarks(page)');
+  const bookmarks = loadBookmarks(page);
+  const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
+  renderBookmarks(currentPageBookmarks);
+  renderPaginator(bookmarks, page);
+}
+
+/**
+ * Stores the Bookmark to local storage
+ *
+ * @param {Object[]} bookmarks - The bookmarks to display.
+ * @param {string} bookmarks[].name - The name of the bookmark.
+ * @param {string} bookmarks[].url - The bookmar's url.
+ */
+function renderBookmarks(bookmarks) {
+  console.log('function renderBookmarks(bookmarks)');
   // TODO
 }
 
 /**
- * Main function
+ * react to user's URL update
  *
+ * @param {*} event
  * @return {void}
  */
-async function main() {
+async function onUrlChange(event) {
   try {
     const url = getUrlFromForm();
     await validateUrl();
@@ -134,6 +177,15 @@ async function main() {
   } catch (err) {
     console.error('Error:', err);
   }
+}
+
+/**
+ * Main function
+ *
+ * @return {void}
+ */
+async function main() {
+  displayBookmarks(0);
 }
 
 main();
