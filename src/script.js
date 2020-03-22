@@ -18,7 +18,7 @@ async function validateUrl(url) {
   setUrlSyntaxInvalidMessage(true);
   let urlExists = false;
   try {
-    urlExists = await validateUrlExists();
+    urlExists = await validateUrlExists(url);
     setUrlNotFoundMessage(false);
   } catch (err) {
     setUrlNotFoundMessage(true);
@@ -46,7 +46,7 @@ function validateUrlSyntax() {
  * @param {string} url - URL to validate
  * @return {boolean} - Verification result
  */
-async function validateUrlExists() {
+async function validateUrlExists(url) {
   const urlExists = false;
   console.log('validateUrlExists');
   // TODO
@@ -104,7 +104,7 @@ function getUrlFromForm() {
  *
  * @param {string} url
  */
-function addUrl(url) {
+function addBookmark(url) {
   console.log('addUrl');
   storeBookmark(url);
   showResultPage(true, url);
@@ -171,7 +171,7 @@ function displayBookmarks(page) {
   const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
-  addEventListeners('paginator-button', 'click', myTEMPFunction);
+  addEventListeners('paginator-button', 'click', onPaginatorClick);
 }
 
 /**
@@ -205,11 +205,12 @@ function renderPaginator(bookmarks, page) {
  * TODO
  *
  */
-function myTEMPFunction() {
+function onPaginatorClick() {
   console.log('function myTEMPFunction');
   const attribute = this.getAttribute('data-myattribute');
   console.log(attribute);
-  removeEventListeners('paginator-button', 'click', myTEMPFunction);
+  // TODO: remove it from here
+  removeEventListeners('paginator-button', 'click', onPaginatorClick);
   // displayBookmarks(attribute);
 }
 
@@ -248,21 +249,56 @@ function removeEventListeners(className, eventType, eventHandlerFunction) {
 }
 
 /**
- * react to user's URL update
+ * React to bookmark's url change
  *
- * @param {*} event
- * @return {void}
+ * @param {Event} event - Change event.
  */
 async function onUrlChange(event) {
+  console.log('function onUrlChange');
   try {
     const url = getUrlFromForm();
-    await validateUrl();
-    showResultPage(true, url);
-    addUrl(url);
+    await validateUrl(url);
   } catch (err) {
     console.error('Error:', err);
   }
 }
+
+/**
+ * React to bookmark's name change
+ *
+ * @param {Event} event - Change event.
+ */
+async function onNameChange(event) {
+  console.log('function onUrlChange');
+  try {
+    const url = getUrlFromForm();
+    await validateUrl(url);
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+/**
+ * Add bookmark
+ *
+ * @param {Event} event - Change event.
+ */
+async function onBookmarkSubmit(event) {
+  event.preventDefault();
+  console.log('function onBookmarkSubmit');
+  try {
+    const url = getUrlFromForm();
+    // TODO:
+    const name = getUrlFromForm();
+    await validateUrl();
+    showResultPage(true, url);
+    addBookmark({url, name});
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+/* =======================  Main  ======================= */
 
 /**
  * Main function
@@ -270,6 +306,9 @@ async function onUrlChange(event) {
  * @return {void}
  */
 async function main() {
+  addEventListeners('bookmark-url', 'input', onUrlChange);
+  addEventListeners('bookmark-name', 'input', onNameChange);
+  addEventListeners('new-bookmark-form', 'submit', onBookmarkSubmit);
   displayBookmarks('0');
 }
 
