@@ -1,7 +1,27 @@
 /* global console, document */
 
-console.log('Hello!');
 
+/* ======================  Current page management  ======================= */
+
+/**
+ * Manages current page getting / setting.
+ *
+ * @return {{get, set}} - Getter and setter of the current page tracker.
+ */
+function currentPage() {
+  const initialPageNumber = 1;
+  this._currentPage = initialPageNumber;
+  this.get = () => this._currentPage;
+  this.set = (newNumber) => this._currentPage = newNumber;
+  return {
+    get: this.get,
+    set: this.set,
+  };
+}
+const getCurrentPage = currentPage().get;
+const setCurrentPage = currentPage().set;
+
+/* ======================  Validators  ======================= */
 
 /**
  * Validates given URL (async)
@@ -139,23 +159,34 @@ function getCurrentPageBookmarks(bookmarks, page) {
 /* =======================  Bookmarks list rendering  ======================= */
 
 /**
+ * Converts page / relative page string to number
+ *
+ * @param {string} pageStr - Page / relative page to convert.
+ * @return {number} - Absolute page number.
+ */
+function getPageNumber(pageStr) {
+  let page = parseInt(pageStr, 10);
+  if (pageStr === 'prev') {
+    page = (getCurrentPage() - 1) || 1;
+  } else if (pageStr === 'next') {
+    // TODO: read from LS
+    const maxPages = 3;
+    page = Math.min((getCurrentPage() + 1), maxPages);
+  }
+  return page;
+}
+
+/**
  * Renders bookmarks list and paginator
  *
- * @param {string} page - Page / relative page to display.
+ * @param {string} pageStr - Page / relative page to display.
  */
-function displayBookmarks(page) {
+function displayBookmarks(pageStr) {
   console.log('function displayBookmarks(page)');
-  const pageNumber = parseInt(page, 10);
-  if (pageNumber) {
-    displayBookmarks(pageNumber);
-  } else if (page === 'prev') {
-    // TODO:
-    displayBookmarks('prev');
-  } else if (page === 'next') {
-    // TODO:
-    displayBookmarks('next');
-  }
-  const bookmarks = loadBookmarks(page);
+  const page = getPageNumber(pageStr);
+  setCurrentPage(page);
+  console.log('page:', page);
+  const bookmarks = loadBookmarks();
   const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
@@ -190,18 +221,28 @@ function renderPaginator(bookmarks, page) {
 /**
  * Shows / hides results page
  *
- * @param {boolean} shouldDisplay - If shows is true, shows results page
+ * @param {boolean} shouldShow - If shows is true, shows results page
  * @param {string} url - Submitted URL
  */
-function showResultPage(shouldDisplay, url) {
-  console.log('showResultPage, shouldDisplay:', shouldDisplay);
+function showResultPage(shouldShow, url) {
+  console.log('showResultPage, shouldDisplay:', shouldShow);
   // TODO
   const resultPageContainer = document.getElementById('results-page-container');
   console.log('resultPageContainer:', resultPageContainer);
-  resultPageContainer.style['visibility'] = shouldDisplay ? 'visible' : 'hidden';
+  resultPageContainer.style['visibility'] = shouldShow ? 'visible' : 'hidden';
 }
 
 /* =======================  Event listeners  ======================= */
+
+/**
+ * Initiate event listeners
+ */
+function initiateEventListeners() {
+  addEventListeners('bookmark-url', 'input', onUrlChange);
+  addEventListeners('bookmark-name', 'input', onNameChange);
+  addEventListeners('new-bookmark-form', 'submit', onBookmarkSubmit);
+  addEventListeners('go-back', 'click', onResultPageClose);
+}
 
 /**
  * TODO
@@ -212,8 +253,8 @@ function onPaginatorClick() {
   const attribute = this.getAttribute('data-myattribute');
   console.log(attribute);
   // TODO: remove it from here
-  removeEventListeners('paginator-button', 'click', onPaginatorClick);
-  // displayBookmarks(attribute);
+  // removeEventListeners('paginator-button', 'click', onPaginatorClick);
+  displayBookmarks(attribute);
 }
 
 
@@ -318,11 +359,8 @@ async function onResultPageClose(event) {
  * @return {void}
  */
 async function main() {
-  addEventListeners('bookmark-url', 'input', onUrlChange);
-  addEventListeners('bookmark-name', 'input', onNameChange);
-  addEventListeners('new-bookmark-form', 'submit', onBookmarkSubmit);
-  addEventListeners('go-back', 'click', onResultPageClose);
-  displayBookmarks('0');
+  initiateEventListeners();
+  displayBookmarks('1');
 }
 
 main();
