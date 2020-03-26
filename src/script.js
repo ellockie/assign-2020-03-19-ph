@@ -1,4 +1,4 @@
-/* global console, document */
+/* global console, document, window */
 
 
 /* ======================  Current page management  ======================= */
@@ -96,26 +96,38 @@ async function setUrlNotFoundMessage(showMessage) {
 }
 
 /**
- * Stores the URL and shows results pag
+ * Retrievs bookmark URL
  *
- * @return {string} - URL from input
+ * @return {string} - Bookmark URL retrieved from input.
  */
 function getUrlFromForm() {
   // TODO
-  const url = 'todo';
+  const url = 'bookmark name';
   console.log('getUrlFromForm');
   return url;
 }
 
 /**
+ * Retrievs bookmark name
+ *
+ * @return {string} - Bookmark name rerieved from input.
+ */
+function getNameFromForm() {
+  // TODO
+  const name = 'bookmark name';
+  console.log('getUrlFromForm');
+  return name;
+}
+
+/**
  * Stores the Bookmark and shows results page
  *
- * @param {string} url
+ * @param {string} bookmark - The bookmark to add to the list.
  */
-function addBookmark(url) {
-  console.log('addUrl');
-  storeBookmark(url);
-  showResultPage(true, url);
+function addBookmark(bookmark) {
+  console.log('addBookmark:', bookmark);
+  appendBookmark(bookmark);
+  showResultPage(true, bookmark);
 }
 
 /* ======================  Local storage operations  ======================= */
@@ -126,21 +138,26 @@ function addBookmark(url) {
  * @return {Object[]} - List of loaded bookmarks.
  */
 function loadBookmarks() {
-  console.log('function storeUrl(bookmark)');
-  // TODO
-  return [];
+  const bookmarks = JSON.parse(window.localStorage.getItem('bookmarks'));
+  return bookmarks;
 }
 
 /**
- * Stores the Bookmark to local storage
+ * Stores the Bookmark to the local storage, by appending it to existing list
  *
  * @param {Object} bookmark - The bookmark to store.
  * @param {string} bookmark.name - Bookmark's name.
  * @param {string} bookmark.url - Bbookmark's url.
  */
-function storeBookmark(bookmark) {
-  console.log('function storeUrl(bookmark)');
+function appendBookmark(bookmark) {
+  console.log('function storeBookmar, bookmark:', bookmark);
   // TODO
+  const bookmarks = loadBookmarks();
+  window.localStorage.setItem(
+      'bookmarks',
+      JSON.stringify([...bookmarks, bookmark]),
+  );
+  console.log(loadBookmarks());
 }
 
 /**
@@ -332,7 +349,7 @@ async function onBookmarkSubmit(event) {
   try {
     const url = getUrlFromForm();
     // TODO:
-    const name = getUrlFromForm();
+    const name = getNameFromForm();
     await validateUrl();
     showResultPage(true, url);
     addBookmark({url, name});
