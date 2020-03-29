@@ -1,20 +1,18 @@
 module.exports = {
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
     "parserOptions": {
-        "ecmaVersion": 8
+        "ecmaVersion": 8,
+        "project": "./src/.json"
     },
-    "extends": ["eslint:recommended", "google"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "google"
+        ],
     "rules": {
-        // enable additional rules
-        // "indent": ["error", 4],
-        // "quotes": ["error", "double"],
-        // "semi": ["error", "always"],
-
-        // override default options for rules from base configurations
-        "linebreak-style": "off",
-        // "comma-dangle": ["error", "always"],
-        // "no-cond-assign": ["error", "always"],
-
-        // disable rules from base configurations
-        // "no-console": "off",
+        "linebreak-style": "off"
     }
 }

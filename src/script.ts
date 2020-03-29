@@ -1,6 +1,10 @@
 /* global console, document, window */
 
 
+interface Bookmark {
+  url: string;
+  name: string;
+}
 /* ======================  Current page management  ======================= */
 
 /**
@@ -10,13 +14,10 @@
  */
 function currentPage() {
   const initialPageNumber = 1;
-  this._currentPage = initialPageNumber;
-  this.get = () => this._currentPage;
-  this.set = (newNumber) => this._currentPage = newNumber;
-  return {
-    get: this.get,
-    set: this.set,
-  };
+  let _currentPage: number = initialPageNumber;
+  const get = () => _currentPage;
+  const set = (newNumber: number) => _currentPage = newNumber;
+  return {get,set};
 }
 const getCurrentPage = currentPage().get;
 const setCurrentPage = currentPage().set;
@@ -29,7 +30,7 @@ const setCurrentPage = currentPage().set;
  * @param {string} url - URL to validate
  * @return {boolean} - Validation result
  */
-async function validateUrl(url) {
+async function validateUrl(url: string) {
   console.log('validateUrl');
   if (!validateUrlSyntax(url)) {
     setUrlSyntaxInvalidMessage(false);
@@ -48,14 +49,26 @@ async function validateUrl(url) {
 }
 
 /**
+ * Validates given URL (async)
+ *
+ * @param {string} name - Bookmark name to validate
+ * @return {boolean} - Validation result
+ */
+async function validateName(name: string) {
+  console.log('validateName');
+  // TODO
+  return false;
+}
+
+/**
  * Validates URL's syntax
  *
  * @param {string} url - URL to validate
  * @return {boolean} - Validation result
  */
-function validateUrlSyntax() {
+function validateUrlSyntax(url: string) {
   const urlvalid = false;
-  console.log('validateUrlSyntax');
+  console.log('validateUrlSyntax, url:', url);
   // TODO
   return urlvalid;
 }
@@ -66,7 +79,7 @@ function validateUrlSyntax() {
  * @param {string} url - URL to validate
  * @return {boolean} - Verification result
  */
-async function validateUrlExists(url) {
+async function validateUrlExists(url: string) {
   const urlExists = false;
   console.log('validateUrlExists');
   // TODO
@@ -79,8 +92,8 @@ async function validateUrlExists(url) {
  * @param {boolean} showMessage - Show or hide flag
  * @return {void}
  */
-async function setUrlSyntaxInvalidMessage(showMessage) {
-  console.log('setUrlSyntaxInvalidMessage');
+async function setUrlSyntaxInvalidMessage(showMessage: boolean) {
+  console.log('setUrlSyntaxInvalidMessage, showMessage:', showMessage);
   // TODO
 }
 
@@ -90,7 +103,7 @@ async function setUrlSyntaxInvalidMessage(showMessage) {
  * @param {boolean} showMessage - Show or hide flag
  * @return {void}
  */
-async function setUrlNotFoundMessage(showMessage) {
+async function setUrlNotFoundMessage(showMessage: boolean) {
   console.log('setUrlNotFoundMessage');
   // TODO
 }
@@ -124,7 +137,7 @@ function getNameFromForm() {
  *
  * @param {string} bookmark - The bookmark to add to the list.
  */
-function addBookmark(bookmark) {
+function addBookmark(bookmark: Bookmark) {
   console.log('addBookmark:', bookmark);
   appendBookmark(bookmark);
   showResultPage(true, bookmark);
@@ -138,8 +151,10 @@ function addBookmark(bookmark) {
  * @return {Object[]} - List of loaded bookmarks.
  */
 function loadBookmarks() {
-  const bookmarks = JSON.parse(window.localStorage.getItem('bookmarks'));
-  return bookmarks;
+  const bookmarksString: string|null = window.localStorage.getItem('bookmarks');
+  return bookmarksString
+    ? JSON.parse(bookmarksString) as Bookmark[]
+    : [];
 }
 
 /**
@@ -149,7 +164,7 @@ function loadBookmarks() {
  * @param {string} bookmark.name - Bookmark's name.
  * @param {string} bookmark.url - Bbookmark's url.
  */
-function appendBookmark(bookmark) {
+function appendBookmark(bookmark: Bookmark) {
   console.log('function storeBookmar, bookmark:', bookmark);
   // TODO
   const bookmarks = loadBookmarks();
@@ -168,9 +183,10 @@ function appendBookmark(bookmark) {
  * @param {string} bookmark.url - Bbookmark's url.
  * @param {number} page - Current page.
  */
-function getCurrentPageBookmarks(bookmarks, page) {
+function getCurrentPageBookmarks(bookmarks: Bookmark[], page: number): Bookmark[] {
   console.log('function getCurrentPageBookmarks(bookmarks, page)');
   // TODO
+  return [];
 }
 
 /* =======================  Bookmarks list rendering  ======================= */
@@ -181,8 +197,8 @@ function getCurrentPageBookmarks(bookmarks, page) {
  * @param {string} pageStr - Page / relative page to convert.
  * @return {number} - Absolute page number.
  */
-function getPageNumber(pageStr) {
-  let page = parseInt(pageStr, 10);
+function getPageNumber(pageStr: string): number {
+  let page = +pageStr;
   if (pageStr === 'prev') {
     page = (getCurrentPage() - 1) || 1;
   } else if (pageStr === 'next') {
@@ -198,13 +214,13 @@ function getPageNumber(pageStr) {
  *
  * @param {string} pageStr - Page / relative page to display.
  */
-function displayBookmarks(pageStr) {
+function displayBookmarks(pageStr: string) {
   console.log('function displayBookmarks(page)');
   const page = getPageNumber(pageStr);
   setCurrentPage(page);
   console.log('page:', page);
   const bookmarks = loadBookmarks();
-  const currentPageBookmarks = getCurrentPageBookmarks(bookmarks, page);
+  const currentPageBookmarks: Bookmark[] = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
   addEventListeners('paginator-button', 'click', onPaginatorClick);
@@ -217,7 +233,7 @@ function displayBookmarks(pageStr) {
  * @param {string} bookmarks[].name - The name of a bookmark.
  * @param {string} bookmarks[].url - Bookmark's url.
  */
-function renderBookmarks(bookmarks) {
+function renderBookmarks(bookmarks: Bookmark[]) {
   console.log('function renderBookmarks(bookmarks)');
   // TODO
 }
@@ -230,7 +246,7 @@ function renderBookmarks(bookmarks) {
  * @param {string} bookmark.url - Bbookmark's url.
  * @param {number} page - Current page.
  */
-function renderPaginator(bookmarks, page) {
+function renderPaginator(bookmarks: Bookmark[], page: number) {
   console.log('function renderPaginator(bookmarks, page)');
   // TODO
 }
@@ -241,12 +257,14 @@ function renderPaginator(bookmarks, page) {
  * @param {boolean} shouldShow - If shows is true, shows results page
  * @param {string} url - Submitted URL
  */
-function showResultPage(shouldShow, url) {
-  console.log('showResultPage, shouldDisplay:', shouldShow);
+function showResultPage(shouldShow: boolean, bookmark: Bookmark|null) {
+  console.log('showResultPage, shouldDisplay:', shouldShow, "bookmark:", bookmark);
   // TODO
   const resultPageContainer = document.getElementById('results-page-container');
   console.log('resultPageContainer:', resultPageContainer);
-  resultPageContainer.style['visibility'] = shouldShow ? 'visible' : 'hidden';
+  if (resultPageContainer) {
+    resultPageContainer.style['visibility'] = shouldShow ? 'visible' : 'hidden';
+  }
 }
 
 /* =======================  Event listeners  ======================= */
@@ -265,8 +283,11 @@ function initiateEventListeners() {
  * TODO
  *
  */
-function onPaginatorClick() {
-  console.log('function myTEMPFunction');
+function onPaginatorClick(this: any): void {
+  console.log('function myTEMPFunction, this:', this);
+  // if (!event.target) {
+  //   return;
+  // }
   const attribute = this.getAttribute('data-myattribute');
   console.log(attribute);
   // TODO: remove it from here
@@ -282,7 +303,11 @@ function onPaginatorClick() {
  * @param {string} eventType - Event type to add.
  * @param {function} eventHandlerFunction - Event handler function to add.
  */
-function addEventListeners(className, eventType, eventHandlerFunction) {
+function addEventListeners(
+  className: string,
+  eventType: string,
+  eventHandlerFunction: EventListenerOrEventListenerObject
+  ): void {
   console.log('function addEventListeners');
   const elements = document.getElementsByClassName(className);
   Array.from(elements).forEach((element) => {
@@ -299,7 +324,11 @@ function addEventListeners(className, eventType, eventHandlerFunction) {
  * @param {string} eventType - Event type to remove.
  * @param {function} eventHandlerFunction - Event handler function to remove.
  */
-function removeEventListeners(className, eventType, eventHandlerFunction) {
+function removeEventListeners(
+  className: string,
+  eventType: string,
+  eventHandlerFunction: EventListenerOrEventListenerObject
+  ): void {
   console.log('function removeEventListeners');
   const elements = document.getElementsByClassName(className);
   Array.from(elements).forEach((element) => {
@@ -313,7 +342,7 @@ function removeEventListeners(className, eventType, eventHandlerFunction) {
  *
  * @param {Event} event - Change event.
  */
-async function onUrlChange(event) {
+async function onUrlChange(event: Event) {
   console.log('function onUrlChange');
   try {
     const url = getUrlFromForm();
@@ -328,11 +357,11 @@ async function onUrlChange(event) {
  *
  * @param {Event} event - Change event.
  */
-async function onNameChange(event) {
+async function onNameChange(event: Event) {
   console.log('function onUrlChange');
   try {
-    const url = getUrlFromForm();
-    await validateUrl(url);
+    const url = getNameFromForm();
+    await validateName(url);
   } catch (err) {
     console.error('Error:', err);
   }
@@ -343,15 +372,18 @@ async function onNameChange(event) {
  *
  * @param {Event} event - Change event.
  */
-async function onBookmarkSubmit(event) {
+function onBookmarkSubmit(event: Event): void{
   event.preventDefault();
   console.log('function onBookmarkSubmit');
+  submitBookmark();
+}
+
+async function submitBookmark(): Promise<void> {
   try {
     const url = getUrlFromForm();
-    // TODO:
     const name = getNameFromForm();
-    await validateUrl();
-    showResultPage(true, url);
+    await validateUrl(url);
+    showResultPage(true, {url, name});
     addBookmark({url, name});
   } catch (err) {
     console.error('Error:', err);
@@ -359,11 +391,66 @@ async function onBookmarkSubmit(event) {
 }
 
 /**
+ * Edit bookmark event handler
+ *
+ * @param {number} event - ID of the bookmark to edit.
+ */
+function onBookmarkEdit(event: Event): void{
+  event.preventDefault();
+  console.log('function onBookmarkEdit');
+  // TODO
+  const bookmarkId = 3;
+  editBookmark(bookmarkId);
+}
+
+async function updateBookmark(): Promise<void> {
+  // DODO: updateBookmark()
+}
+
+/**
+ * Edit bookmark
+ *
+ * @param {number} bookmarkId - ID of the bookmark to edit.
+ */
+function editBookmark(bookmarkId: number): void{
+  console.log('function onBookmarkEdit, bookmarkId:', bookmarkId);
+  // TODO, MAYBE?
+  showEditConfirmationDialog();
+  updateBookmark();
+}
+
+function showEditConfirmationDialog() {
+  console.log("Are you surre??");
+}
+
+/**
+ * Edit bookmark
+ *
+ * @param {number} event - ID of the bookmark to edit.
+ */
+function onBookmarkDelete(event: Event): void{
+  event.preventDefault();
+  console.log('function onBookmarkDelete');
+  // TODO
+  showDeleteConfirmationDialog();
+  const bookmarkId = 3;
+  deleteBookmark(bookmarkId);
+}
+
+function deleteBookmark(bookmarkId) {
+  console.log("deleteBookmark:",)
+}
+
+function showDeleteConfirmationDialog() {
+  console.log("Are you surre??");
+}
+
+/**
  * React to bookmark's name change
  *
  * @param {Event} event - Change event.
  */
-async function onResultPageClose(event) {
+async function onResultPageClose(event: Event) {
   console.log('function onResultPageClose');
   showResultPage(false, null);
 }

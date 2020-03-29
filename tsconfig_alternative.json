@@ -1,0 +1,25 @@
+{
+"compilerOptions": {
+    "target": "es2017",
+    // "module": "amd",  // only amd and system support option --outFile
+    // "module": "system",
+    "module": "commonjs",
+    "declaration": false,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "noLib": false,
+    // "lib": ["es2017", "dom"]
+},
+"include": [
+    "**/*"
+],
+"exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+],
+"files": [
+    "src/script.ts"  // now contains both modules, again
+],
+"parser": "typescript-eslint-parser",
+"plugins": ["typescript"],
+}
