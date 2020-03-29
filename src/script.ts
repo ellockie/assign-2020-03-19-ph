@@ -223,7 +223,6 @@ function displayBookmarks(pageStr: string) {
   const currentPageBookmarks: Bookmark[] = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
   renderPaginator(bookmarks, page);
-  addEventListeners('paginator-button', 'click', onPaginatorClick);
 }
 
 /**
@@ -248,7 +247,11 @@ function renderBookmarks(bookmarks: Bookmark[]) {
  */
 function renderPaginator(bookmarks: Bookmark[], page: number) {
   console.log('function renderPaginator(bookmarks, page)');
+  // remove those listeners when not needed
+  removeEventListeners('paginator-button', 'click', onPaginatorClick);
   // TODO
+  // render, then:
+  addEventListeners2('paginator-button', 'click', onPaginatorClick);
 }
 
 /**
@@ -283,15 +286,10 @@ function initiateEventListeners() {
  * TODO
  *
  */
-function onPaginatorClick(this: any): void {
-  console.log('function myTEMPFunction, this:', this);
-  // if (!event.target) {
-  //   return;
-  // }
-  const attribute = this.getAttribute('data-myattribute');
+function onPaginatorClick(paginatorElem: any): void {// tslint:disable-line: no-any
+  console.log('function onPaginatorClick:', paginatorElem.target.dataset.myattribute);
+  const attribute: string = paginatorElem.target.dataset.myattribute || "";
   console.log(attribute);
-  // TODO: remove it from here
-  // removeEventListeners('paginator-button', 'click', onPaginatorClick);
   displayBookmarks(attribute);
 }
 
@@ -313,9 +311,7 @@ function addEventListeners(
   Array.from(elements).forEach((element) => {
     element.addEventListener(eventType, eventHandlerFunction, false);
   });
-  // TODO: remove those listeners when not needed
 }
-
 
 /**
  * Removes event listeners of a given type from elements of a given CSS class.
@@ -333,6 +329,25 @@ function removeEventListeners(
   const elements = document.getElementsByClassName(className);
   Array.from(elements).forEach((element) => {
     element.removeEventListener(eventType, eventHandlerFunction);
+  });
+}
+
+/**
+ * Sets event listeners of a given type to elements of a given CSS class.
+ *
+ * @param {string} className - Target CSS class name.
+ * @param {string} eventType - Event type to add.
+ * @param {function} eventHandlerFunction - Event handler function to add.
+ */
+function addEventListeners2(
+  className: string,
+  eventType: string,
+  eventHandlerFunction: Function
+  ): void {
+  console.log('function addEventListeners2');
+  const elements = document.getElementsByClassName(className);
+  Array.from(elements).forEach((element) => {
+    element.addEventListener(eventType, element => eventHandlerFunction(element), false);
   });
   // TODO: remove those listeners when not needed
 }
@@ -433,11 +448,12 @@ function onBookmarkDelete(event: Event): void{
   console.log('function onBookmarkDelete');
   // TODO
   showDeleteConfirmationDialog();
-  const bookmarkId = 3;
+  const bookmarkId = "3";
   deleteBookmark(bookmarkId);
 }
 
-function deleteBookmark(bookmarkId) {
+function deleteBookmark(bookmarkId: string) {
+  // TODO:
   console.log("deleteBookmark:",)
 }
 
