@@ -1,5 +1,6 @@
 /* global console, document, window */
 
+const PAGINATOR_BUTTON_CLASS = 'paginator-button';
 
 interface Bookmark {
   url: string;
@@ -12,15 +13,15 @@ interface Bookmark {
  *
  * @return {{get, set}} - Getter and setter of the current page tracker.
  */
-function currentPage() {
-  const initialPageNumber = 1;
-  let _currentPage: number = initialPageNumber;
-  const get = () => _currentPage;
-  const set = (newNumber: number) => _currentPage = newNumber;
-  return {get,set};
+class CurrentPage {
+  private static _currentPage: number;
+  static get = () => CurrentPage._currentPage;
+  static set = (newNumber: number) => CurrentPage._currentPage = newNumber;
 }
-const getCurrentPage = currentPage().get;
-const setCurrentPage = currentPage().set;
+const getCurrentPage = CurrentPage.get;
+const setCurrentPage = CurrentPage.set;
+
+const paginator = document.getElementById("paginator") as Element;
 
 /* ======================  Validators  ======================= */
 
@@ -246,12 +247,50 @@ function renderBookmarks(bookmarks: Bookmark[]) {
  * @param {number} page - Current page.
  */
 function renderPaginator(bookmarks: Bookmark[], page: number) {
-  console.log('function renderPaginator(bookmarks, page)');
+  console.log('function renderPaginator(bookmarks, page)', page);
   // remove those listeners when not needed
   removeEventListeners('paginator-button', 'click', onPaginatorClick);
   // TODO
-  // render, then:
+
+  paginator.innerHTML = '';
+  const maxPage = 12;
+  setCurrentPage(+page);
+  const currentPage: number = getCurrentPage();
+
+  const links: any[] = [{
+    display: "<<",
+    page: currentPage - 1,
+    class: "disabled"
+  }];
+  console.log("currentPage:", currentPage);
+    links.push({
+      display: "" + (currentPage - 1),
+      page: currentPage - 1,
+      class: "disabled"});
+  // }
+  links.push({
+    display: "" + currentPage,
+    page: currentPage,
+    class: ""
+  });
+  if (currentPage < maxPage) {
+    links.push({
+      display: "" + (currentPage + 1),
+      page: currentPage + 1,
+      class: "disabled"});
+  }
+  links.push({display: ">>", page: currentPage + 1, class: ""});
+  // TODO: add class,
+  links.forEach((link) => paginator.appendChild(getPaginatorElement(link)));
   addEventListeners2('paginator-button', 'click', onPaginatorClick);
+}
+
+function getPaginatorElement(linksObj: any): Element {
+  const li = document.createElement("button");
+  li.innerHTML = linksObj.display;
+  li.className = `${PAGINATOR_BUTTON_CLASS} ${linksObj.class}`;
+  li.dataset.navString = "" + linksObj.page;
+  return li;
 }
 
 /**
@@ -287,8 +326,8 @@ function initiateEventListeners() {
  *
  */
 function onPaginatorClick(paginatorElem: any): void {// tslint:disable-line: no-any
-  console.log('function onPaginatorClick:', paginatorElem.target.dataset.myattribute);
-  const attribute: string = paginatorElem.target.dataset.myattribute || "";
+  console.log('function onPaginatorClick:', paginatorElem.target.dataset["navString"]);
+  const attribute: string = paginatorElem.target.dataset["navString"] || "";
   console.log(attribute);
   displayBookmarks(attribute);
 }
