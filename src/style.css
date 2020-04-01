@@ -10,3 +10,30 @@ li {
 	border-radius: 8px;
 	cursor: pointer;
 }
+
+.paginator-button {
+    margin: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    width: 22px;
+    box-sizing: content-box;
+	background-color: white;
+}
+
+.paginator-button.disabled {
+	opacity: .4;
+	cursor: default;
+}
+.paginator-button.invisible {
+	cursor: default;
+	visibility: hidden;
+}
+
+.paginator-button.current {
+	cursor: default;
+	background-color: rgb(0, 132, 255);
+    color: white;
+}

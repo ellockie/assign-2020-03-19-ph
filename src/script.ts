@@ -253,44 +253,64 @@ function renderPaginator(bookmarks: Bookmark[], page: number) {
   // TODO
 
   paginator.innerHTML = '';
-  const maxPage = 12;
+  const maxPage = 6;
   setCurrentPage(+page);
   const currentPage: number = getCurrentPage();
 
+  // <<
   const links: any[] = [{
     display: "<<",
+    page: 1,
+    class: currentPage === 1 ? "disabled" : ""
+  },
+  // -1
+  {
+    display: "<",
     page: currentPage - 1,
-    class: "disabled"
-  }];
-  console.log("currentPage:", currentPage);
-    links.push({
-      display: "" + (currentPage - 1),
-      page: currentPage - 1,
-      class: "disabled"});
-  // }
-  links.push({
+    class: currentPage === 1 ? "disabled" : ""
+  },
+  // -1
+  {
+    display: "" + (currentPage - 1),
+    page: currentPage - 1,
+    class: (currentPage - 1) < 1 ? "invisible" : ""
+  },
+  // current
+  {
     display: "" + currentPage,
     page: currentPage,
-    class: ""
-  });
-  if (currentPage < maxPage) {
-    links.push({
-      display: "" + (currentPage + 1),
-      page: currentPage + 1,
-      class: "disabled"});
-  }
-  links.push({display: ">>", page: currentPage + 1, class: ""});
+    class: "current"
+  },
+  // + 1
+  {
+    display: "" + (currentPage + 1),
+    page: currentPage + 1,
+    class: currentPage === maxPage ? "invisible" : ""
+  },
+  // >
+  {
+    display: ">",
+    page: currentPage + 1,
+    class: currentPage === maxPage ? "disabled" : ""
+  },
+  // >>
+  {
+    display: ">>",
+    page: maxPage,
+    class: currentPage === maxPage ? "disabled" : ""
+  }];
   // TODO: add class,
   links.forEach((link) => paginator.appendChild(getPaginatorElement(link)));
   addEventListeners2('paginator-button', 'click', onPaginatorClick);
 }
 
 function getPaginatorElement(linksObj: any): Element {
-  const li = document.createElement("button");
-  li.innerHTML = linksObj.display;
-  li.className = `${PAGINATOR_BUTTON_CLASS} ${linksObj.class}`;
-  li.dataset.navString = "" + linksObj.page;
-  return li;
+  const btn = document.createElement("button");
+  btn.innerHTML = linksObj.display;
+  btn.className = `${PAGINATOR_BUTTON_CLASS} ${linksObj.class}`;
+  btn.disabled = linksObj.class.includes("disabled") || linksObj.class.includes("current");
+  btn.dataset.navString = "" + linksObj.page;
+  return btn;
 }
 
 /**
@@ -347,9 +367,10 @@ function addEventListeners(
   ): void {
   console.log('function addEventListeners');
   const elements = document.getElementsByClassName(className);
-  Array.from(elements).forEach((element) => {
-    element.addEventListener(eventType, eventHandlerFunction, false);
-  });
+  Array.from(elements)
+    .forEach((element) => {
+      element.addEventListener(eventType, eventHandlerFunction, false);
+    });
 }
 
 /**
@@ -385,9 +406,13 @@ function addEventListeners2(
   ): void {
   console.log('function addEventListeners2');
   const elements = document.getElementsByClassName(className);
-  Array.from(elements).forEach((element) => {
-    element.addEventListener(eventType, element => eventHandlerFunction(element), false);
-  });
+  console.log('Array.from(elements).length:', Array.from(elements).length);
+  Array.from(elements)
+    .filter(element => !element.classList.contains("disabled"))
+    .filter(element => !element.classList.contains("invisible"))
+    .forEach((element) => {
+      element.addEventListener(eventType, element => eventHandlerFunction(element), false);
+    });
   // TODO: remove those listeners when not needed
 }
 
