@@ -1,11 +1,18 @@
 /* global console, document, window */
 
 const PAGINATOR_BUTTON_CLASS = 'paginator-button';
+const PAGE_SIZE = 2;
 
 interface Bookmark {
   url: string;
   name: string;
 }
+interface PaginatorItem {
+    display: string;
+    page: number;
+    class: string;
+}
+
 /* ======================  Current page management  ======================= */
 
 /**
@@ -15,11 +22,16 @@ interface Bookmark {
  */
 class CurrentPage {
   private static _currentPage: number;
+  private static _lastPage = 3;
   static get = () => CurrentPage._currentPage;
   static set = (newNumber: number) => CurrentPage._currentPage = newNumber;
+  static getLastPage = () => CurrentPage._lastPage;
+  static setLastPage = (newNumber: number) => CurrentPage._lastPage = newNumber;
 }
 const getCurrentPage = CurrentPage.get;
 const setCurrentPage = CurrentPage.set;
+const getLastPage = CurrentPage.getLastPage;
+const setLastPage = CurrentPage.setLastPage;
 
 const paginator = document.getElementById("paginator") as Element;
 
@@ -193,33 +205,14 @@ function getCurrentPageBookmarks(bookmarks: Bookmark[], page: number): Bookmark[
 /* =======================  Bookmarks list rendering  ======================= */
 
 /**
- * Converts page / relative page string to number
- *
- * @param {string} pageStr - Page / relative page to convert.
- * @return {number} - Absolute page number.
- */
-function getPageNumber(pageStr: string): number {
-  let page = +pageStr;
-  if (pageStr === 'prev') {
-    page = (getCurrentPage() - 1) || 1;
-  } else if (pageStr === 'next') {
-    // TODO: read from LS
-    const maxPages = 3;
-    page = Math.min((getCurrentPage() + 1), maxPages);
-  }
-  return page;
-}
-
-/**
  * Renders bookmarks list and paginator
  *
  * @param {string} pageStr - Page / relative page to display.
  */
-function displayBookmarks(pageStr: string) {
-  console.log('function displayBookmarks(page)');
-  const page = getPageNumber(pageStr);
+function displayBookmarks(_page: number|null) {
+  console.log('function displayBookmarks, page:', _page);
+  const page: number = _page || getCurrentPage();
   setCurrentPage(page);
-  console.log('page:', page);
   const bookmarks = loadBookmarks();
   const currentPageBookmarks: Bookmark[] = getCurrentPageBookmarks(bookmarks, page);
   renderBookmarks(currentPageBookmarks);
@@ -250,65 +243,53 @@ function renderPaginator(bookmarks: Bookmark[], page: number) {
   console.log('function renderPaginator(bookmarks, page)', page);
   // remove those listeners when not needed
   removeEventListeners('paginator-button', 'click', onPaginatorClick);
-  // TODO
-
+  // clear the current contents
   paginator.innerHTML = '';
-  const maxPage = 6;
-  setCurrentPage(+page);
+  setCurrentPage(page);
   const currentPage: number = getCurrentPage();
+  const buttonDefinitions: PaginatorItem[] = getButtonDefinitions(currentPage);
+  buttonDefinitions
+    .forEach((link) => paginator.appendChild(getPaginatorElement(link)));
+  addPaginatorEventListeners('paginator-button', 'click', onPaginatorClick);
+}
 
-  // <<
-  const links: any[] = [{
-    display: "<<",
+function getButtonDefinitions(currentPage: number) {
+  const lastPage = getLastPage();
+  return [{ // <<
+    display: "<i class='material-icons'>fast_rewind</i>",
     page: 1,
     class: currentPage === 1 ? "disabled" : ""
-  },
-  // -1
-  {
-    display: "<",
-    page: currentPage - 1,
-    class: currentPage === 1 ? "disabled" : ""
-  },
-  // -1
-  {
+    // }, { // prev
+    //   display: "<i class='material-icons reversed'>play_arrow</i>",
+    //   page: currentPage - 1,
+    //   class: currentPage === 1 ? "disabled" : ""
+  }, { // -1
     display: "" + (currentPage - 1),
     page: currentPage - 1,
     class: (currentPage - 1) < 1 ? "invisible" : ""
-  },
-  // current
-  {
+  }, { // current
     display: "" + currentPage,
     page: currentPage,
     class: "current"
-  },
-  // + 1
-  {
+  }, { // + 1
     display: "" + (currentPage + 1),
     page: currentPage + 1,
-    class: currentPage === maxPage ? "invisible" : ""
-  },
-  // >
-  {
-    display: ">",
-    page: currentPage + 1,
-    class: currentPage === maxPage ? "disabled" : ""
-  },
-  // >>
-  {
-    display: ">>",
-    page: maxPage,
-    class: currentPage === maxPage ? "disabled" : ""
-  }];
-  // TODO: add class,
-  links.forEach((link) => paginator.appendChild(getPaginatorElement(link)));
-  addEventListeners2('paginator-button', 'click', onPaginatorClick);
+    class: currentPage === lastPage ? "invisible" : ""
+    // }, { // >
+    //   display: "<i class='material-icons'>play_arrow</i>",
+    //   page: currentPage + 1,
+    //   class: currentPage === lastPage ? "disabled" : ""
+    }, { // >>
+    display: "<i class='material-icons'>fast_forward</i>",
+    page: lastPage,
+    class: currentPage === lastPage ? "disabled" : ""
+  }]
 }
 
-function getPaginatorElement(linksObj: any): Element {
-  const btn = document.createElement("button");
+function getPaginatorElement(linksObj: PaginatorItem): Element {
+  const btn = document.createElement("li");
   btn.innerHTML = linksObj.display;
   btn.className = `${PAGINATOR_BUTTON_CLASS} ${linksObj.class}`;
-  btn.disabled = linksObj.class.includes("disabled") || linksObj.class.includes("current");
   btn.dataset.navString = "" + linksObj.page;
   return btn;
 }
@@ -346,10 +327,12 @@ function initiateEventListeners() {
  *
  */
 function onPaginatorClick(paginatorElem: any): void {// tslint:disable-line: no-any
-  console.log('function onPaginatorClick:', paginatorElem.target.dataset["navString"]);
-  const attribute: string = paginatorElem.target.dataset["navString"] || "";
-  console.log(attribute);
-  displayBookmarks(attribute);
+  const paginatorButton = paginatorElem.path
+    .find((pathElement: Element) => {
+      return pathElement.className.includes('paginator-button');
+    });
+  const targetPage: number|null = +paginatorButton.dataset["navString"] || null;
+  displayBookmarks(targetPage);
 }
 
 
@@ -399,21 +382,20 @@ function removeEventListeners(
  * @param {string} eventType - Event type to add.
  * @param {function} eventHandlerFunction - Event handler function to add.
  */
-function addEventListeners2(
+function addPaginatorEventListeners(
   className: string,
   eventType: string,
   eventHandlerFunction: Function
   ): void {
-  console.log('function addEventListeners2');
+  console.log('function addPaginatorEventListeners');
   const elements = document.getElementsByClassName(className);
-  console.log('Array.from(elements).length:', Array.from(elements).length);
   Array.from(elements)
     .filter(element => !element.classList.contains("disabled"))
     .filter(element => !element.classList.contains("invisible"))
+    .filter(element => !element.classList.contains("current"))
     .forEach((element) => {
       element.addEventListener(eventType, element => eventHandlerFunction(element), false);
     });
-  // TODO: remove those listeners when not needed
 }
 
 /**
@@ -544,7 +526,7 @@ async function onResultPageClose(event: Event) {
  */
 async function main() {
   initiateEventListeners();
-  displayBookmarks('1');
+  displayBookmarks(1);
 }
 
 main();
