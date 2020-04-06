@@ -17,7 +17,7 @@ interface PaginatorItem {
 /* ======================  Current page management  ======================= */
 
 /**
- * Manages current page getting / setting.
+ * Manages page / bookmarks counters.
  *
  * @return {{getCurrentPage, setCurrentPage, setLastPage, getLastPage}} - Getter and setter of the current page tracker.
  */
