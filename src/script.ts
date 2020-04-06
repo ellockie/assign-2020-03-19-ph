@@ -7,6 +7,7 @@ interface Bookmark {
   url: string;
   name: string;
 }
+
 interface PaginatorItem {
     display: string;
     page: number;
@@ -18,20 +19,29 @@ interface PaginatorItem {
 /**
  * Manages current page getting / setting.
  *
- * @return {{get, set}} - Getter and setter of the current page tracker.
+ * @return {{getCurrentPage, setCurrentPage, setLastPage, getLastPage}} - Getter and setter of the current page tracker.
  */
-class CurrentPage {
+class Counters {
+  private static _updateLastPage = () => {
+    return Counters._lastPage = Math.ceil(Counters._bookmarksCount / PAGE_SIZE);
+  }
   private static _currentPage: number;
-  private static _lastPage = 3;
-  static get = () => CurrentPage._currentPage;
-  static set = (newNumber: number) => CurrentPage._currentPage = newNumber;
-  static getLastPage = () => CurrentPage._lastPage;
-  static setLastPage = (newNumber: number) => CurrentPage._lastPage = newNumber;
+  private static _bookmarksCount: number = loadBookmarks().length;
+  private static _lastPage: number = Counters._updateLastPage();
+  static getCurrentPage = () => Counters._currentPage;
+  static setCurrentPage = (newNumber: number) => Counters._currentPage = newNumber;
+  static getLastPage = () => Counters._lastPage;
+  static incrementBookmarksCounter = () => Counters._bookmarksCount += 1;
+  static decrementBookmarksCounter = () => Counters._bookmarksCount -= 1;
 }
-const getCurrentPage = CurrentPage.get;
-const setCurrentPage = CurrentPage.set;
-const getLastPage = CurrentPage.getLastPage;
-const setLastPage = CurrentPage.setLastPage;
+
+const {
+  getCurrentPage,
+  setCurrentPage,
+  getLastPage,
+  incrementBookmarksCounter,
+  decrementBookmarksCounter
+} = Counters;
 
 const paginator = document.getElementById("paginator") as Element;
 
@@ -153,6 +163,7 @@ function getNameFromForm() {
 function addBookmark(bookmark: Bookmark) {
   console.log('addBookmark:', bookmark);
   appendBookmark(bookmark);
+  incrementBookmarksCounter();
   showResultPage(true, bookmark);
 }
 
@@ -500,7 +511,8 @@ function onBookmarkDelete(event: Event): void{
 
 function deleteBookmark(bookmarkId: string) {
   // TODO:
-  console.log("deleteBookmark:",)
+  console.log("deleteBookmark:");
+  decrementBookmarksCounter();
 }
 
 function showDeleteConfirmationDialog() {
